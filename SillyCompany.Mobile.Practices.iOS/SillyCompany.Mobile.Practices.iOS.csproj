@@ -25,7 +25,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
-    <MtouchLink>SdkOnly</MtouchLink>
+    <MtouchLink>None</MtouchLink>
     <MtouchDebug>true</MtouchDebug>
     <CodesignKey>iPhone Developer</CodesignKey>
     <CodesignProvision />
@@ -39,6 +39,7 @@
     <MtouchSdkVersion>13.0</MtouchSdkVersion>
     <MtouchFloat32>true</MtouchFloat32>
     <CodeAnalysisRuleSet />
+    <MtouchNoSymbolStrip>true</MtouchNoSymbolStrip>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
     <DebugType>none</DebugType>
@@ -121,14 +122,17 @@
     <CodeAnalysisRuleSet />
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="FFImageLoading.ImageSourceHandler">
-      <Version>1.0.0</Version>
-    </PackageReference>
     <PackageReference Include="MetroLog">
       <Version>1.0.1</Version>
     </PackageReference>
     <PackageReference Include="Refractored.XamForms.PullToRefresh">
       <Version>2.4.1.1-beta</Version>
+    </PackageReference>
+    <PackageReference Include="Sharpnado.MaterialFrame">
+      <Version>1.1.1</Version>
+    </PackageReference>
+    <PackageReference Include="Sharpnado.Shadows">
+      <Version>1.1.0</Version>
     </PackageReference>
     <PackageReference Include="SkiaSharp.Views.Forms">
       <Version>1.68.1.1</Version>
@@ -145,7 +149,10 @@
       <Version>3.0.0.5</Version>
     </PackageReference>
     <PackageReference Include="Xamarin.Forms">
-      <Version>4.4.0.991477</Version>
+      <Version>4.6.0.847</Version>
+    </PackageReference>
+    <PackageReference Include="Xamarin.Forms.Nuke">
+      <Version>8.4.0</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
@@ -157,6 +164,7 @@
   <ItemGroup>
     <Compile Include="Main.cs" />
     <Compile Include="AppDelegate.cs" />
+    <Compile Include="Renderers\BorderlessPickerRenderer.cs" />
     <Compile Include="Renderers\iOSNavigationBarRenderer.cs" />
     <None Include="Entitlements.plist" />
     <None Include="Info.plist">
@@ -296,6 +304,24 @@
   </ItemGroup>
   <ItemGroup>
     <BundleResource Include="Resources\camera_96.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\theme_96.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\bliss.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\vista.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\bliss_portrait.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\vista_portrait.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\vista_portrait_2.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 </Project>

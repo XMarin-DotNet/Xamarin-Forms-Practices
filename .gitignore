@@ -188,3 +188,5 @@ FakesAssemblies/
 # Xamarin components samples
 Components/**/samples/
 /src/TeamLinkr.sln.DotSettings
+.idea
+.DS_Store

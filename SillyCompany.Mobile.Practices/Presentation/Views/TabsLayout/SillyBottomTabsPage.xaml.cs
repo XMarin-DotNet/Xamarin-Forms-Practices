@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
+using Sharpnado.Presentation.Forms.Helpers;
 using Sharpnado.Presentation.Forms.RenderedViews;
 using Sharpnado.Tasks;
 
@@ -12,10 +13,20 @@ using NavigationPage = Xamarin.Forms.NavigationPage;
 
 namespace SillyCompany.Mobile.Practices.Presentation.Views.TabsLayout
 {
+    public enum AppTheme
+    {
+        Light = 0,
+        Acrylic = 1,
+        Dark = 2,
+        Neumorphism = 3,
+        AcrylicDarkBlur = 4,
+        AcrylicBlur = 5,
+    }
+
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class SillyBottomTabsPage : SillyContentPage, IBindablePage
     {
-        private Theme _currentTheme;
+        private AppTheme _currentAppTheme;
 
         public SillyBottomTabsPage()
         {
@@ -24,14 +35,11 @@ namespace SillyCompany.Mobile.Practices.Presentation.Views.TabsLayout
 
             TabButton.TapCommand = new Command(() => System.Diagnostics.Debug.WriteLine("TapButton tapped!"));
 
-            _currentTheme = Theme.Dark;
+            _currentAppTheme = AppTheme.Acrylic;
             ApplyTheme();
-        }
 
-        private enum Theme
-        {
-            Light = 0,
-            Dark,
+            GridContainer.RaiseChild(Toolbar);
+            GridContainer.RaiseChild(TabHost);
         }
 
         protected override void OnAppearing()
@@ -45,31 +53,94 @@ namespace SillyCompany.Mobile.Practices.Presentation.Views.TabsLayout
 
         private void ApplyTheme()
         {
-            if (_currentTheme == Theme.Light)
+            switch (_currentAppTheme)
             {
-                ResourcesHelper.SetLightMode();
-                TabHost.ShadowType = ShadowType.None;
-                return;
+                case AppTheme.Acrylic:
+                    ResourcesHelper.SetLightMode(true);
+                    break;
+                case AppTheme.AcrylicDarkBlur:
+                    ResourcesHelper.SetDarkBlur();
+                    break;
+                case AppTheme.AcrylicBlur:
+                    ResourcesHelper.SetLightBlur();
+                    break;
+                case AppTheme.Light:
+                    ResourcesHelper.SetLightMode(false);
+                    break;
+                case AppTheme.Neumorphism:
+                    ResourcesHelper.SetNeumorphicMode();
+                    break;
+                case AppTheme.Dark:
+                    ResourcesHelper.SetDarkMode();
+                    break;
+            }
+        }
+
+        private void ToolbarOnTapped(object sender, EventArgs e)
+        {
+            if (_currentAppTheme == AppTheme.AcrylicBlur)
+            {
+                _currentAppTheme = AppTheme.Light;
+            }
+            else
+            {
+                _currentAppTheme += 1;
             }
 
-            ResourcesHelper.SetDarkMode();
-            TabHost.ShadowType = ShadowType.None;
+            ApplyTheme();
         }
 
         private void TabButtonOnClicked(object sender, EventArgs e)
         {
             TaskMonitor.Create(AnimateTabButton);
 
-            _currentTheme = _currentTheme == Theme.Light ? Theme.Dark : Theme.Light;
-            ApplyTheme();
+            ((HomeView)HomeLazyView.Content).LogMaterialFrameContent();
         }
 
         private async Task AnimateTabButton()
         {
-            await TabButton.ScaleTo(2);
-            await TabButton.ScaleTo(1);
-            await TabButton.ScaleTo(2);
-            await TabButton.ScaleTo(1);
+            double sourceScale = TabButton.Scale;
+            Color sourceColor = TabButton.ButtonBackgroundColor;
+            Color targetColor = _currentAppTheme == AppTheme.Light
+                ? ResourcesHelper.GetResourceColor("DarkSurface")
+                : Color.White;
+
+            await TabButton.ScaleTo(3);
+            await TabButton.ScaleTo(sourceScale);
+            TabButton.IconImageSource = null;
+
+            var bigScaleTask = TabButton.ScaleTo(30, length: 500);
+
+            var colorChangeTask = TabButton.ColorTo(
+                sourceColor,
+                targetColor,
+                callback: c => TabButton.ButtonBackgroundColor = c,
+                length: 500);
+
+            await Task.WhenAll(bigScaleTask, colorChangeTask);
+
+            if (_currentAppTheme == AppTheme.AcrylicBlur)
+            {
+                _currentAppTheme = AppTheme.Light;
+            }
+            else
+            {
+                _currentAppTheme += 1;
+            }
+
+            ApplyTheme();
+
+            var reverseBigScaleTask = TabButton.ScaleTo(sourceScale, length: 500);
+
+            var reverseColorChangeTask = TabButton.ColorTo(
+                targetColor,
+                sourceColor,
+                c => TabButton.ButtonBackgroundColor = c,
+                length: 500);
+
+            await Task.WhenAll(reverseBigScaleTask, reverseColorChangeTask);
+
+            TabButton.IconImageSource = "theme_96.png";
         }
     }
 }

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Runtime.CompilerServices;
 
 using Sharpnado.Presentation.Forms.Effects;
 
@@ -21,14 +17,8 @@ namespace SillyCompany.Mobile.Practices.Presentation.CustomViews
             nameof(ShowBackButton),
             typeof(bool),
             typeof(Toolbar),
-            defaultValue: false);
-
-        public static readonly BindableProperty HasShadowProperty = BindableProperty.Create(
-            nameof(HasShadow),
-            typeof(bool),
-            typeof(Toolbar),
             defaultValue: false,
-            propertyChanged: HasShadowPropertyChanged);
+            propertyChanged: ShowBackButtonPropertyChanged);
 
         public static readonly BindableProperty ForegroundColorProperty = BindableProperty.Create(
             nameof(ForegroundColor),
@@ -41,7 +31,12 @@ namespace SillyCompany.Mobile.Practices.Presentation.CustomViews
             typeof(Toolbar),
             string.Empty);
 
-        private const int ShadowHeight = 6;
+        public static readonly BindableProperty SubtitleProperty = BindableProperty.Create(
+            nameof(Subtitle),
+            typeof(string),
+            typeof(Toolbar),
+            string.Empty,
+            propertyChanged: SubtitlePropertyChanged);
 
         public Toolbar()
         {
@@ -50,14 +45,6 @@ namespace SillyCompany.Mobile.Practices.Presentation.CustomViews
             var navigationService = DependencyContainer.Instance.GetInstance<INavigationService>();
 
             TapCommandEffect.SetTap(BackButton, AsyncCommand.Create(() => navigationService.NavigateBackAsync()));
-
-            UpdateShadow();
-        }
-
-        public bool HasShadow
-        {
-            get => (bool)GetValue(HasShadowProperty);
-            set => SetValue(HasShadowProperty, value);
         }
 
         public bool ShowBackButton
@@ -78,35 +65,37 @@ namespace SillyCompany.Mobile.Practices.Presentation.CustomViews
             set => SetValue(TitleProperty, value);
         }
 
-        private static void HasShadowPropertyChanged(BindableObject bindable, object oldvalue, object newvalue)
+        public string Subtitle
         {
-            var toolbar = (Toolbar)bindable;
-            toolbar.UpdateShadow();
+            get => (string)GetValue(SubtitleProperty);
+            set => SetValue(SubtitleProperty, value);
         }
 
-        private void UpdateShadow()
+        protected override void OnPropertyChanging([CallerMemberName] string propertyName = null)
         {
-            if (HasShadow)
-            {
-                ShadowRowDefinition.Height = new GridLength(ShadowHeight);
-                ShadowBoxView.IsVisible = true;
-                Margin = new Thickness(Margin.Left, Margin.Top, Margin.Right, Margin.Bottom - ShadowHeight);
+            base.OnPropertyChanging(propertyName);
+        }
 
-                var boxView1 = new BoxView { BackgroundColor = BackgroundColor };
-                var boxView2 = new BoxView { BackgroundColor = BackgroundColor };
-                BackgroundColor = Color.Transparent;
-                Grid.Children.Insert(0, boxView1);
-                Grid.Children.Insert(1, boxView2);
-                Grid.SetRow(boxView1, 0);
-                Grid.SetColumnSpan(boxView1, 3);
-                Grid.SetRow(boxView2, 1);
-                Grid.SetColumnSpan(boxView2, 3);
-            }
-            else
-            {
-                ShadowRowDefinition.Height = new GridLength(0);
-                ShadowBoxView.IsVisible = false;
-            }
+        private static void ShowBackButtonPropertyChanged(BindableObject bindable, object oldvalue, object newvalue)
+        {
+            var toolbar = (Toolbar)bindable;
+            toolbar.UpdateShowBackButton();
+        }
+
+        private static void SubtitlePropertyChanged(BindableObject bindable, object oldvalue, object newvalue)
+        {
+            var toolbar = (Toolbar)bindable;
+            toolbar.UpdateSubtitle();
+        }
+
+        private void UpdateShowBackButton()
+        {
+            ButtonColumnDefinition.Width = ShowBackButton ? 50 : 0;
+        }
+
+        private void UpdateSubtitle()
+        {
+            SubtitleRowDefinition.Height = string.IsNullOrEmpty(Subtitle) ? 0 : GridLength.Auto;
         }
     }
 }

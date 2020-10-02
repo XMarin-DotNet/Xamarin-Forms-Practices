@@ -2,18 +2,17 @@
 <views:SillyContentPage x:Class="SillyCompany.Mobile.Practices.Presentation.Views.DudeDetails.SillyDudePage"
                         xmlns="http://xamarin.com/schemas/2014/forms"
                         xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-                        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                        xmlns:d="http://xamarin.com/schemas/2014/forms/design"
                         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                         mc:Ignorable="d"
                         xmlns:details="clr-namespace:SillyCompany.Mobile.Practices.Presentation.Views.DudeDetails"
                         xmlns:dudeDetails="clr-namespace:SillyCompany.Mobile.Practices.Presentation.ViewModels.DudeDetails"
                         xmlns:loader="clr-namespace:Sharpnado.Presentation.Forms.CustomViews;assembly=Sharpnado.TaskLoaderView"
-                        xmlns:loc="clr-namespace:SillyCompany.Mobile.Practices.Localization;assembly=SillyCompany.Mobile.Practices"
+                        xmlns:materialFrame="clr-namespace:Sharpnado.MaterialFrame;assembly=Sharpnado.MaterialFrame"
                         xmlns:skiaRate="clr-namespace:SkiaRate;assembly=SillyCompany.Mobile.Practices"
                         xmlns:tabs="clr-namespace:Sharpnado.Presentation.Forms.CustomViews.Tabs;assembly=Sharpnado.Presentation.Forms"
                         xmlns:tb="clr-namespace:SillyCompany.Mobile.Practices.Presentation.CustomViews;assembly=SillyCompany.Mobile.Practices"
                         xmlns:views="clr-namespace:SillyCompany.Mobile.Practices.Presentation.Views;assembly=SillyCompany.Mobile.Practices"
-                        d:DataContext="{d:DesignInstance dudeDetails:SillyDudeVm}"
                         x:DataType="dudeDetails:SillyDudeVm">
 
     <ContentPage.Resources>
@@ -24,7 +23,15 @@
                 <Setter Property="LabelSize" Value="14" />
                 <Setter Property="Padding" Value="20, 0" />
                 <Setter Property="UnderlineAllTab" Value="False" />
-                <Setter Property="UnselectedLabelColor" Value="White" />
+                <Setter Property="UnselectedLabelColor" Value="Gray" />
+            </Style>
+
+            <Style x:Key="SegmentedTabStyle" TargetType="tabs:SegmentedTabItem">
+                <Setter Property="SelectedTabColor" Value="{StaticResource Accent}" />
+                <Setter Property="FontFamily" Value="{StaticResource FontSemiBold}" />
+                <Setter Property="LabelSize" Value="14" />
+                <Setter Property="SelectedLabelColor" Value="{DynamicResource DynamicDudeBackgroundColor}" />
+                <Setter Property="UnselectedLabelColor" Value="Gray" />
             </Style>
         </ResourceDictionary>
     </ContentPage.Resources>
@@ -33,18 +40,19 @@
 
         <loader:TaskLoaderView AbsoluteLayout.LayoutFlags="All"
                                AbsoluteLayout.LayoutBounds="0, 0, 1, 1"
+                               BackgroundColor="{DynamicResource DynamicDudeBackgroundColor}"
                                AccentColor="{StaticResource Accent}"
-                               BackgroundColor="{StaticResource Primary}"
                                TaskLoaderNotifier="{Binding SillyDudeLoaderNotifier}">
-            <Grid Padding="{StaticResource StandardThickness}"
+            <Grid x:Name="GridContainer"
+                  RowSpacing="0"
                   ColumnSpacing="0"
-                  RowSpacing="0">
+                  Padding="{StaticResource StandardThickness}">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="200" />
+                    <RowDefinition Height="300" />
                     <RowDefinition Height="40" />
                     <RowDefinition Height="30" />
                     <RowDefinition Height="30" />
-                    <RowDefinition Height="50" />
+                    <RowDefinition Height="80" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
@@ -55,21 +63,27 @@
                        Aspect="AspectFill"
                        Source="{Binding SillyDudeLoaderNotifier.Result.ImageUrl}" />
 
-                <BoxView Grid.Row="1"
-                         Grid.RowSpan="3"
-                         Margin="-16,0"
-                         BackgroundColor="#99000000" />
+                <materialFrame:MaterialFrame Grid.Row="1"
+                                             Grid.RowSpan="3"
+                                             Margin="-16,0"
+                                             Padding="0"
+                                             AndroidBlurRootElement="{Binding Source={x:Reference GridContainer}}"
+                                             CornerRadius="0"
+                                             IsClippedToBounds="False"
+                                             MaterialBlurStyle="Dark"
+                                             MaterialTheme="AcrylicBlur"
+                                             StyleId="7777" />
 
                 <Label Grid.Row="1"
                        Style="{StaticResource TextTitle}"
                        VerticalOptions="End"
-                       Text="{Binding SillyDudeLoaderNotifier.Result.FullName}"
-                       TextColor="White" />
+                       TextColor="White"
+                       Text="{Binding SillyDudeLoaderNotifier.Result.FullName}" />
 
                 <Label Grid.Row="2"
                        Style="{StaticResource TextSubhead}"
-                       Text="{Binding SillyDudeLoaderNotifier.Result.Role}"
-                       TextColor="White" />
+                       TextColor="White"
+                       Text="{Binding SillyDudeLoaderNotifier.Result.Role}" />
 
                 <skiaRate:RatingView Grid.Row="3"
                                      WidthRequest="100"
@@ -81,31 +95,17 @@
                                      RatingType="Floating"
                                      Value="{Binding SillyDudeLoaderNotifier.Result.SillinessDegree}" />
 
-                <tabs:TabHostView x:Name="TabHost"
-                                  Grid.Row="4"
-                                  Margin="-16,0"
-                                  BackgroundColor="{StaticResource DarkElevation4dp}"
-                                  SelectedIndex="{Binding Source={x:Reference Switcher}, Path=SelectedIndex, Mode=TwoWay}"
-                                  ShowScrollbar="False"
-                                  TabType="Scrollable">
-                    <tabs:TabHostView.Tabs>
-                        <tabs:UnderlinedTabItem Style="{StaticResource TabStyle}" Label="{loc:Translate Tabs_Quote}" />
-                        <tabs:UnderlinedTabItem Style="{StaticResource TabStyle}" Label="{loc:Translate Tabs_Filmography}" />
-                        <tabs:UnderlinedTabItem Style="{StaticResource TabStyle}" Label="{loc:Translate Tabs_Meme}" />
-                        <tabs:UnderlinedTabItem Style="{StaticResource TabStyle}" Label="SOME MORE" />
-                        <tabs:UnderlinedTabItem Style="{StaticResource TabStyle}" Label="WUT" />
-                        <tabs:UnderlinedTabItem Style="{StaticResource TabStyle}" Label="AGAIN" />
-                        <tabs:UnderlinedTabItem Style="{StaticResource TabStyle}" Label="FURTHER MORE" />
-                    </tabs:TabHostView.Tabs>
-                </tabs:TabHostView>
 
-                <ScrollView Grid.Row="5">
+
+                <ScrollView Grid.Row="4"
+                            Grid.RowSpan="2">
                     <tabs:ViewSwitcher x:Name="Switcher"
                                        Animate="True"
+                                       Padding="0,80,0,0"
                                        SelectedIndex="{Binding SelectedViewModelIndex, Mode=TwoWay}">
-                        <details:Quote Animate="True" BindingContext="{Binding Quote}" />
-                        <details:Filmo Animate="True" BindingContext="{Binding Filmo}" />
-                        <details:Meme Animate="True" BindingContext="{Binding Meme}" />
+                        <details:Quote BindingContext="{Binding Quote}" Animate="True" />
+                        <details:Filmo BindingContext="{Binding Filmo}" Animate="True" />
+                        <details:Meme BindingContext="{Binding Meme}" Animate="True" />
                         <Label Style="{StaticResource TextHeader}"
                                Margin="60,80"
                                Text="Fitter. Happier. More productive. Like a pig. In a cage. On antibiotics." />
@@ -119,8 +119,50 @@
                                Margin="60,80"
                                Text="I'M A SHOOTING STAR ON MY WAY TO MARS ON A COLLISION COURSE I AM A SATELLITE I'M OUT OF CONTROL IM A SEX MACHINE READY TO RELOAD" />
                     </tabs:ViewSwitcher>
-
                 </ScrollView>
+
+                <!-- Tabs are above the view switcher -->
+
+                <!-- Uncomment these to test classic scrollable underlined tabs -->
+                <!--<tabs:TabHostView x:Name="TabHost"
+                                  Grid.Row="4"
+                                  Margin="-16,0"
+                                  BackgroundColor="{DynamicResource Elevation4dpColor}"
+                                  Style="{DynamicResource DynamicBottomShadow}"
+                                  ShowScrollbar="False"
+                                  TabType="Scrollable"
+                                  SelectedIndex="{Binding Source={x:Reference Switcher}, Path=SelectedIndex, Mode=TwoWay}">
+                    <tabs:TabHostView.Tabs>
+                        <tabs:UnderlinedTabItem Style="{StaticResource TabStyle}" Label="{loc:Translate Tabs_Quote}" />
+                        <tabs:UnderlinedTabItem Style="{StaticResource TabStyle}" Label="{loc:Translate Tabs_Filmography}" />
+                        <tabs:UnderlinedTabItem Style="{StaticResource TabStyle}" Label="{loc:Translate Tabs_Meme}" />
+                        <tabs:UnderlinedTabItem Style="{StaticResource TabStyle}" Label="SOME MORE" />
+                        <tabs:UnderlinedTabItem Style="{StaticResource TabStyle}" Label="WUT" />
+                        <tabs:UnderlinedTabItem Style="{StaticResource TabStyle}" Label="AGAIN" />
+                        <tabs:UnderlinedTabItem Style="{StaticResource TabStyle}" Label="FURTHER MORE" />
+                    </tabs:TabHostView.Tabs>
+                </tabs:TabHostView>-->
+
+                <!-- Uncomment these to test segmented tabs -->
+                <tabs:TabHostView x:Name="TabHost"
+                                  Grid.Row="4"
+                                  HeightRequest="40"
+                                  Margin="20,15,20,0"
+                                  VerticalOptions="Center"
+                                  BackgroundColor="{DynamicResource DynamicDudeBackgroundColor}"
+                                  Shades="{DynamicResource DynamicTabsShadow}"
+                                  CornerRadius="20"
+                                  IsSegmented="True"
+                                  SegmentedHasSeparator="True"
+                                  SegmentedOutlineColor="{DynamicResource DynamicOutlineColor}"
+                                  TabType="Fixed"
+                                  SelectedIndex="{Binding Source={x:Reference Switcher}, Path=SelectedIndex, Mode=TwoWay}">
+                    <tabs:TabHostView.Tabs>
+                        <tabs:SegmentedTabItem Style="{StaticResource SegmentedTabStyle}" Label="Quote" />
+                        <tabs:SegmentedTabItem Style="{StaticResource SegmentedTabStyle}" Label="Movies" />
+                        <tabs:SegmentedTabItem Style="{StaticResource SegmentedTabStyle}" Label="Meme" />
+                    </tabs:TabHostView.Tabs>
+                </tabs:TabHostView>
             </Grid>
         </loader:TaskLoaderView>
 

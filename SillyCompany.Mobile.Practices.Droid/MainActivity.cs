@@ -8,6 +8,16 @@ using Android.App;
 using Android.Content.PM;
 using Android.OS;
 using Android.Views;
+
+using Microsoft.Device.Display;
+
+using Sharpnado.MaterialFrame.Droid;
+using Sharpnado.Presentation.Forms.Droid;
+
+using SillyCompany.Mobile.Practices.Infrastructure;
+
+using Xamarin.Duo.Forms.Samples;
+using Xamarin.Forms;
 using Xamarin.Forms.Platform.Android;
 
 namespace SillyCompany.Mobile.Practices.Droid
@@ -24,9 +34,22 @@ namespace SillyCompany.Mobile.Practices.Droid
 
             base.OnCreate(bundle);
 
-            Xamarin.Forms.Forms.Init(this, bundle);
+            var screenHelper = new ScreenHelper();
+            bool isDuo = screenHelper.Initialize(this);
 
-            LoadApplication(new App());
+            PlatformService.InitializeFoldingScreen(isDuo);
+
+            HingeService.MainActivity = this;
+
+            Forms.Init(this, bundle);
+
+            SharpnadoInitializer.Initialize(enableInternalLogger: true, enableInternalDebugLogger: true);
+            Android.Glide.Forms.Init(this);
+            AndroidMaterialFrameRenderer.ThrowStopExceptionOnDraw = false;
+            AndroidMaterialFrameRenderer.BlurAutoUpdateDelayMilliseconds = 200;
+            AndroidMaterialFrameRenderer.BlurProcessingDelayMilliseconds = 100;
+
+            this.LoadApplication(new App());
         }
     }
 }

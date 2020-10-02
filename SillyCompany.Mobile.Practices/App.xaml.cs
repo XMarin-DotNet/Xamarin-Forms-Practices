@@ -7,11 +7,19 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
+using System;
+
+using MetroLog;
+
 using Sharpnado.Presentation.Forms.RenderedViews;
 
+using SillyCompany.Mobile.Practices.Infrastructure;
 using SillyCompany.Mobile.Practices.Presentation.Navigables;
 using SillyCompany.Mobile.Practices.Presentation.ViewModels;
+using SillyCompany.Mobile.Practices.Presentation.ViewModels.SurfaceDuo;
 using SillyCompany.Mobile.Practices.Presentation.ViewModels.TabsLayout;
+using SillyCompany.Mobile.Practices.Presentation.Views;
+
 using Xamarin.Forms;
 
 namespace SillyCompany.Mobile.Practices
@@ -21,6 +29,8 @@ namespace SillyCompany.Mobile.Practices
     /// </summary>
     public partial class App : Application
     {
+        private static readonly ILogger Logger = LoggerFactory.GetLogger(nameof(App));
+
         /// <summary>
         /// Initializes a new instance of the <see cref="App"/> class.
         /// </summary>
@@ -28,20 +38,33 @@ namespace SillyCompany.Mobile.Practices
         {
             InitializeComponent();
 
-            MaterialFrame.ChangeGlobalTheme(MaterialFrame.Theme.Dark);
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomainUnhandledException;
 
             var viewLocator = DependencyContainer.Instance.GetInstance<IViewLocator>();
 
-#if INFINITE_LIST
-            var firstScreenView = viewLocator.GetViewFor<SillyBottomTabsPageViewModel>();
+            IBindablePage firstScreenView;
+            if (PlatformService.IsFoldingScreen)
+            {
+                firstScreenView = viewLocator.GetViewFor<TwoPanePageViewModel>();
+            }
+            else
+            {
+#if OLD
+                firstScreenView = viewLocator.GetViewFor<SillyPeopleVm>();
 #else
-            var firstScreenView = viewLocator.GetViewFor<SillyPeopleVm>();
+                firstScreenView = viewLocator.GetViewFor<SillyBottomTabsPageViewModel>();
 #endif
+            }
 
             MainPage = new NavigationPage((Page)firstScreenView);
             NavigationPage.SetHasNavigationBar(MainPage, false);
             var firstScreenVm = (ANavigableViewModel)firstScreenView.BindingContext;
             firstScreenVm.Load(null);
+        }
+
+        private void CurrentDomainUnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            Logger.Error($"Unhandled exception: {e}");
         }
 
         /// <summary>
